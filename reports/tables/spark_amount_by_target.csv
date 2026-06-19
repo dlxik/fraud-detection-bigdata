@@ -1,0 +1,3 @@
+is_fraud,transactions,avg_amount,median_amount,min_amount,max_amount
+0,1289169,67.66710981260036,47.28,1.0,28948.9
+1,7506,531.3200919264586,394.72,1.06,1376.04

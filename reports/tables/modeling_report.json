@@ -1,0 +1,12 @@
+{
+  "train_rows_full": 1296675,
+  "train_rows_sampled": 45036,
+  "test_rows": 555719,
+  "features": 84,
+  "negative_to_positive_ratio": 5,
+  "models": {
+    "logistic_regression": "D:\\main\\Full\\documents\\uni\\Nam 2\\Ky 2\\big data\\cki\\fraud-detection-bigdata\\models\\logistic_regression.joblib",
+    "random_forest": "D:\\main\\Full\\documents\\uni\\Nam 2\\Ky 2\\big data\\cki\\fraud-detection-bigdata\\models\\random_forest.joblib"
+  },
+  "metrics_output": "D:\\main\\Full\\documents\\uni\\Nam 2\\Ky 2\\big data\\cki\\fraud-detection-bigdata\\reports\\tables\\model_metrics.csv"
+}

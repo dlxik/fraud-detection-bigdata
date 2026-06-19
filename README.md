@@ -1,1 +1,108 @@
-# fraud-detection-bigdata
+# Fraud Detection System using Big Data Analytics
+
+Hệ thống phát hiện giao dịch gian lận từ dữ liệu giao dịch tài chính, sử dụng Pandas, Apache Spark/PySpark và Machine Learning.
+
+## Dataset
+
+Nguồn dữ liệu: https://www.kaggle.com/datasets/kartik2112/fraud-detection
+
+File đã dùng:
+
+- `data/raw/fraudTrain.csv`
+- `data/raw/fraudTest.csv`
+
+Biến mục tiêu:
+
+- `is_fraud = 0`: giao dịch hợp lệ
+- `is_fraud = 1`: giao dịch gian lận
+
+## Cấu trúc dự án
+
+```text
+data/
+  raw/
+  processed/
+models/
+notebooks/
+  01_EDA.ipynb
+  02_Preprocessing.ipynb
+  03_Spark_Processing.ipynb
+  04_Modeling.ipynb
+reports/
+  figures/
+  tables/
+src/
+  preprocessing.py
+  spark_processing.py
+  evaluate.py
+  train.py
+requirements.txt
+```
+
+## Pipeline
+
+1. EDA: phân tích phân bố target, amount, category, merchant, thời gian, địa lý.
+2. Preprocessing: tạo feature thời gian, tuổi khách hàng, khoảng cách khách hàng-merchant, encode categorical, scale numerical.
+3. Spark Processing: xử lý dữ liệu bằng Spark DataFrame, fraud theo category/state/merchant/hour, so sánh Pandas và Spark.
+4. Modeling: huấn luyện Logistic Regression và Random Forest.
+5. Evaluation: Accuracy, Precision, Recall, F1-score, ROC-AUC, confusion matrix, ROC curve.
+
+## Cách chạy
+
+Cài thư viện:
+
+```bash
+pip install -r requirements.txt
+```
+
+Chạy preprocessing:
+
+```bash
+python src/preprocessing.py
+```
+
+Chạy Spark processing:
+
+```bash
+python src/spark_processing.py
+```
+
+Chạy training và evaluation:
+
+```bash
+python src/train.py
+```
+
+## Kết quả chính
+
+Dataset train:
+
+- Tổng giao dịch: 1,296,675
+- Fraud: 7,506
+- Fraud rate: 0.5789%
+
+Kết quả mô hình trên test set:
+
+| Model | Accuracy | Precision | Recall | F1-score | ROC-AUC |
+|---|---:|---:|---:|---:|---:|
+| Random Forest | 0.9836 | 0.1802 | 0.9147 | 0.3011 | 0.9899 |
+| Logistic Regression | 0.9393 | 0.0451 | 0.7305 | 0.0850 | 0.9055 |
+
+Random Forest cho kết quả tốt hơn, đặc biệt ở Recall và ROC-AUC. Với bài toán fraud detection, Recall cao rất quan trọng vì giúp giảm số giao dịch gian lận bị bỏ sót.
+
+## Output quan trọng
+
+Tables:
+
+- `reports/tables/model_metrics.csv`
+- `reports/tables/classification_reports_all_models.csv`
+- `reports/tables/spark_dataset_summary.csv`
+- `reports/tables/spark_fraud_by_category.csv`
+- `reports/tables/spark_high_risk_merchants.csv`
+
+Figures:
+
+- `reports/figures/confusion_matrix_random_forest.png`
+- `reports/figures/confusion_matrix_logistic_regression.png`
+- `reports/figures/roc_curve_models.png`
+- `reports/figures/model_metrics_comparison.png`
