@@ -1,0 +1,10 @@
+dir
+dir data\raw
+python src\preprocessing.py
+python src\spark_processing.py
+python src\train.py --negative-ratio 5
+python -c "import pandas as pd; cols=['model','precision','recall','f1_score','roc_auc','pr_auc','threshold']; print(pd.read_csv('reports/tables/t4.1_model_metrics.csv')[cols].head(5).to_string(index=False))"
+python src\generate_artifacts.py
+explorer reports\figures
+explorer reports
+dir models
