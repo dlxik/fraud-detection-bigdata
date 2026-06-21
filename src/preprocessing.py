@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import argparse
 import json
@@ -204,7 +204,7 @@ def preprocess(
             "train_output": str(train_output),
             "test_output": str(test_output),
         }
-        (table_dir / "preprocessing_report.json").write_text(
+        (table_dir / "t2.1_preprocessing_report.json").write_text(
             json.dumps(report, indent=2),
             encoding="utf-8",
         )
@@ -217,7 +217,10 @@ def preprocess(
                 "n_unique": train_df.nunique(dropna=True).values,
             }
         )
-        feature_summary.to_csv(table_dir / "processed_feature_summary.csv", index=False)
+        feature_summary.to_csv(
+            table_dir / "t2.2_processed_feature_summary.csv",
+            index=False,
+        )
 
         frequency_sizes = pd.DataFrame(
             {
@@ -225,7 +228,10 @@ def preprocess(
                 "unique_values": [len(v) for v in frequency_mappings.values()],
             }
         )
-        frequency_sizes.to_csv(table_dir / "frequency_encoding_summary.csv", index=False)
+        frequency_sizes.to_csv(
+            table_dir / "t2.3_frequency_encoding_summary.csv",
+            index=False,
+        )
 
         scaler_stats = pd.DataFrame(
             {
@@ -234,7 +240,7 @@ def preprocess(
                 "scale": scaler.scale_,
             }
         )
-        scaler_stats.to_csv(table_dir / "scaler_summary.csv", index=False)
+        scaler_stats.to_csv(table_dir / "t2.4_scaler_summary.csv", index=False)
 
     return train_df, test_df
 

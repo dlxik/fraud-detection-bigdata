@@ -1,4 +1,4 @@
-# Slide Outline - Fraud Detection System using Big Data Analytics
+﻿# Slide Outline - Fraud Detection System using Big Data Analytics
 
 ## Slide 1 - Title
 
@@ -41,9 +41,9 @@ Raw Data -> EDA -> Preprocessing -> Feature Engineering -> Spark Processing -> M
 
 Hình gợi ý:
 
-- `target_distribution.png`
-- `amount_distribution_log_scale.png`
-- `category_transaction_count_and_fraud_rate.png`
+- `f1.1_target_distribution.png`
+- `f1.2_amount_distribution_log_scale.png`
+- `f1.4_category_transaction_count_and_fraud_rate.png`
 
 ## Slide 7 - Preprocessing
 
@@ -100,10 +100,10 @@ Chiến lược xử lý mất cân bằng:
 
 Hình gợi ý:
 
-- `confusion_matrix_random_forest.png`
-- `roc_curve_models.png`
-- `precision_recall_curve_models.png`
-- `model_metrics_comparison.png`
+- `f4.1_confusion_matrix_hist_gradient_boosting_tuned_f1.png`
+- `f4.2_roc_curve_models.png`
+- `f4.3_precision_recall_curve_models.png`
+- `f4.4_model_metrics_comparison.png`
 
 ## Slide 13 - Conclusion
 

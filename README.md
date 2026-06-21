@@ -1,4 +1,4 @@
-# Fraud Detection System using Big Data Analytics
+﻿# Fraud Detection System using Big Data Analytics
 
 Hệ thống phát hiện giao dịch gian lận từ dữ liệu giao dịch tài chính, sử dụng Pandas, Apache Spark/PySpark và Machine Learning.
 
@@ -96,16 +96,16 @@ HistGradientBoosting cho kết quả tốt nhất, vừa giữ Recall rất cao 
 
 Tables:
 
-- `reports/tables/model_metrics.csv`
-- `reports/tables/classification_reports_all_models.csv`
-- `reports/tables/spark_dataset_summary.csv`
-- `reports/tables/spark_fraud_by_category.csv`
-- `reports/tables/spark_high_risk_merchants.csv`
+- `reports/tables/t4.1_model_metrics.csv`
+- `reports/tables/t4.2_classification_reports_all_models.csv`
+- `reports/tables/t3.1_dataset_summary.csv`
+- `reports/tables/t3.2_fraud_by_category.csv`
+- `reports/tables/t3.4_high_risk_merchants.csv`
 
 Figures:
 
-- `reports/figures/confusion_matrix_random_forest.png`
-- `reports/figures/confusion_matrix_logistic_regression.png`
-- `reports/figures/roc_curve_models.png`
-- `reports/figures/precision_recall_curve_models.png`
-- `reports/figures/model_metrics_comparison.png`
+- `reports/figures/f4.1_confusion_matrix_hist_gradient_boosting_tuned_f1.png`
+- `reports/figures/f4.1_confusion_matrix_random_forest_tuned_f1.png`
+- `reports/figures/f4.2_roc_curve_models.png`
+- `reports/figures/f4.3_precision_recall_curve_models.png`
+- `reports/figures/f4.4_model_metrics_comparison.png`

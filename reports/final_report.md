@@ -1,4 +1,4 @@
-# Báo Cáo Dự Án: Fraud Detection System using Big Data Analytics
+﻿# Báo Cáo Dự Án: Fraud Detection System using Big Data Analytics
 
 ## 1. Giới Thiệu
 
@@ -70,12 +70,12 @@ Các nội dung đã thực hiện:
 
 Một số biểu đồ đã xuất:
 
-- `target_distribution.png`
-- `amount_distribution_log_scale.png`
-- `category_transaction_count_and_fraud_rate.png`
-- `merchant_transaction_count_and_fraud_rate.png`
-- `fraud_rate_by_hour.png`
-- `correlation_heatmap.png`
+- `f1.1_target_distribution.png`
+- `f1.2_amount_distribution_log_scale.png`
+- `f1.4_category_transaction_count_and_fraud_rate.png`
+- `f1.5_merchant_transaction_count_and_fraud_rate.png`
+- `f1.6_fraud_rate_by_hour.png`
+- `f1.12_correlation_heatmap.png`
 
 ## 5. Preprocessing Và Feature Engineering
 
@@ -203,11 +203,11 @@ Nhận xét:
 
 Biểu đồ đã xuất:
 
-- `confusion_matrix_random_forest.png`
-- `confusion_matrix_logistic_regression.png`
-- `roc_curve_models.png`
-- `precision_recall_curve_models.png`
-- `model_metrics_comparison.png`
+- `f4.1_confusion_matrix_hist_gradient_boosting_tuned_f1.png`
+- `f4.1_confusion_matrix_random_forest_tuned_f1.png`
+- `f4.2_roc_curve_models.png`
+- `f4.3_precision_recall_curve_models.png`
+- `f4.4_model_metrics_comparison.png`
 
 ## 9. Kết Luận
 

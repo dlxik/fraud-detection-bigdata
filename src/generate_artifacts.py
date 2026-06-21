@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from pathlib import Path
 
@@ -99,13 +99,13 @@ def generate_pdf(root: Path) -> Path:
         )
     )
 
-    metrics = pd.read_csv(table_dir / "model_metrics.csv")
+    metrics = pd.read_csv(table_dir / "t4.1_model_metrics.csv")
     metrics_display = metrics[
         ["model", "threshold", "precision", "recall", "f1_score", "roc_auc", "pr_auc"]
     ]
-    spark_summary = pd.read_csv(table_dir / "spark_dataset_summary.csv")
-    category = pd.read_csv(table_dir / "spark_fraud_by_category.csv")
-    merchants = pd.read_csv(table_dir / "spark_high_risk_merchants.csv")
+    spark_summary = pd.read_csv(table_dir / "t3.1_dataset_summary.csv")
+    category = pd.read_csv(table_dir / "t3.2_fraud_by_category.csv")
+    merchants = pd.read_csv(table_dir / "t3.4_high_risk_merchants.csv")
 
     story = [
         Paragraph("Fraud Detection System using Big Data Analytics", styles["VNTitle"]),
@@ -134,8 +134,8 @@ def generate_pdf(root: Path) -> Path:
             styles["VNBody"],
         ),
     ]
-    add_report_image(story, figure_dir / "target_distribution.png")
-    add_report_image(story, figure_dir / "category_transaction_count_and_fraud_rate.png")
+    add_report_image(story, figure_dir / "f1.1_target_distribution.png")
+    add_report_image(story, figure_dir / "f1.4_category_transaction_count_and_fraud_rate.png")
 
     story.extend(
         [
@@ -157,9 +157,9 @@ def generate_pdf(root: Path) -> Path:
             table_from_dataframe(metrics_display),
         ]
     )
-    add_report_image(story, figure_dir / "roc_curve_models.png")
-    add_report_image(story, figure_dir / "precision_recall_curve_models.png")
-    add_report_image(story, figure_dir / "model_metrics_comparison.png")
+    add_report_image(story, figure_dir / "f4.2_roc_curve_models.png")
+    add_report_image(story, figure_dir / "f4.3_precision_recall_curve_models.png")
+    add_report_image(story, figure_dir / "f4.4_model_metrics_comparison.png")
 
     story.extend(
         [
@@ -226,7 +226,7 @@ def generate_pptx(root: Path) -> Path:
     output_path = root / "reports" / "fraud_detection_presentation.pptx"
     table_dir = root / "reports" / "tables"
     figure_dir = root / "reports" / "figures"
-    metrics = pd.read_csv(table_dir / "model_metrics.csv")[
+    metrics = pd.read_csv(table_dir / "t4.1_model_metrics.csv")[
         ["model", "threshold", "precision", "recall", "f1_score", "roc_auc", "pr_auc"]
     ]
 
@@ -266,8 +266,8 @@ def generate_pptx(root: Path) -> Path:
             "Value: fraud detection supports risk reduction and decision making.",
         ],
     )
-    add_picture_slide(prs, "Target Distribution", figure_dir / "target_distribution.png")
-    add_picture_slide(prs, "Category Fraud Analysis", figure_dir / "category_transaction_count_and_fraud_rate.png")
+    add_picture_slide(prs, "Target Distribution", figure_dir / "f1.1_target_distribution.png")
+    add_picture_slide(prs, "Category Fraud Analysis", figure_dir / "f1.4_category_transaction_count_and_fraud_rate.png")
     add_bullets_slide(
         prs,
             "Preprocessing",
@@ -290,9 +290,13 @@ def generate_pptx(root: Path) -> Path:
         ],
     )
     add_metrics_slide(prs, metrics)
-    add_picture_slide(prs, "ROC Curve", figure_dir / "roc_curve_models.png")
-    add_picture_slide(prs, "Precision-Recall Curve", figure_dir / "precision_recall_curve_models.png")
-    add_picture_slide(prs, "Confusion Matrix - Random Forest", figure_dir / "confusion_matrix_random_forest.png")
+    add_picture_slide(prs, "ROC Curve", figure_dir / "f4.2_roc_curve_models.png")
+    add_picture_slide(prs, "Precision-Recall Curve", figure_dir / "f4.3_precision_recall_curve_models.png")
+    add_picture_slide(
+        prs,
+        "Confusion Matrix - HistGradientBoosting",
+        figure_dir / "f4.1_confusion_matrix_hist_gradient_boosting_tuned_f1.png",
+    )
     add_bullets_slide(
         prs,
             "Conclusion",

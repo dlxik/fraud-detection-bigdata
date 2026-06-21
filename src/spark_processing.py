@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import argparse
 import json
@@ -193,13 +193,13 @@ def run_spark_processing(raw_csv_path: Path, table_dir: Path) -> dict[str, Path]
     spark.sparkContext.setLogLevel("WARN")
 
     outputs = {
-        "spark_dataset_summary": table_dir / "spark_dataset_summary.csv",
-        "spark_fraud_by_category": table_dir / "spark_fraud_by_category.csv",
-        "spark_fraud_by_state": table_dir / "spark_fraud_by_state.csv",
-        "spark_high_risk_merchants": table_dir / "spark_high_risk_merchants.csv",
-        "spark_fraud_by_hour": table_dir / "spark_fraud_by_hour.csv",
-        "spark_amount_by_target": table_dir / "spark_amount_by_target.csv",
-        "spark_pandas_comparison": table_dir / "spark_pandas_comparison.csv",
+        "spark_dataset_summary": table_dir / "t3.1_dataset_summary.csv",
+        "spark_fraud_by_category": table_dir / "t3.2_fraud_by_category.csv",
+        "spark_fraud_by_state": table_dir / "t3.3_fraud_by_state.csv",
+        "spark_high_risk_merchants": table_dir / "t3.4_high_risk_merchants.csv",
+        "spark_fraud_by_hour": table_dir / "t3.5_fraud_by_hour.csv",
+        "spark_amount_by_target": table_dir / "t3.6_amount_by_target.csv",
+        "spark_pandas_comparison": table_dir / "t3.7_pandas_comparison.csv",
     }
 
     try:
@@ -226,7 +226,7 @@ def run_spark_processing(raw_csv_path: Path, table_dir: Path) -> dict[str, Path]
             "outputs": {name: str(path) for name, path in outputs.items()},
             "spark_version": spark.version,
         }
-        (table_dir / "spark_processing_report.json").write_text(
+        (table_dir / "t3.8_processing_report.json").write_text(
             json.dumps(manifest, indent=2),
             encoding="utf-8",
         )

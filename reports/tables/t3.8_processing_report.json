@@ -1,0 +1,13 @@
+﻿{
+  "input": "D:\\main\\Full\\documents\\uni\\Nam 2\\Ky 2\\big data\\cki\\fraud-detection-bigdata\\data\\raw\\fraudTrain.csv",
+  "outputs": {
+    "spark_dataset_summary": "D:\\main\\Full\\documents\\uni\\Nam 2\\Ky 2\\big data\\cki\\fraud-detection-bigdata\\reports\\tables\\t3.1_dataset_summary.csv",
+    "spark_fraud_by_category": "D:\\main\\Full\\documents\\uni\\Nam 2\\Ky 2\\big data\\cki\\fraud-detection-bigdata\\reports\\tables\\t3.2_fraud_by_category.csv",
+    "spark_fraud_by_state": "D:\\main\\Full\\documents\\uni\\Nam 2\\Ky 2\\big data\\cki\\fraud-detection-bigdata\\reports\\tables\\t3.3_fraud_by_state.csv",
+    "spark_high_risk_merchants": "D:\\main\\Full\\documents\\uni\\Nam 2\\Ky 2\\big data\\cki\\fraud-detection-bigdata\\reports\\tables\\t3.4_high_risk_merchants.csv",
+    "spark_fraud_by_hour": "D:\\main\\Full\\documents\\uni\\Nam 2\\Ky 2\\big data\\cki\\fraud-detection-bigdata\\reports\\tables\\t3.5_fraud_by_hour.csv",
+    "spark_amount_by_target": "D:\\main\\Full\\documents\\uni\\Nam 2\\Ky 2\\big data\\cki\\fraud-detection-bigdata\\reports\\tables\\t3.6_amount_by_target.csv",
+    "spark_pandas_comparison": "D:\\main\\Full\\documents\\uni\\Nam 2\\Ky 2\\big data\\cki\\fraud-detection-bigdata\\reports\\tables\\t3.7_pandas_comparison.csv"
+  },
+  "spark_version": "3.5.1"
+}

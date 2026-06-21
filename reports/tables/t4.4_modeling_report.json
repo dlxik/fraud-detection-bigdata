@@ -1,4 +1,4 @@
-{
+﻿{
   "train_rows_full": 1296675,
   "train_rows_sampled": 45036,
   "train_rows_model_fit": 36028,
@@ -11,5 +11,5 @@
     "random_forest": "D:\\main\\Full\\documents\\uni\\Nam 2\\Ky 2\\big data\\cki\\fraud-detection-bigdata\\models\\random_forest.joblib",
     "hist_gradient_boosting": "D:\\main\\Full\\documents\\uni\\Nam 2\\Ky 2\\big data\\cki\\fraud-detection-bigdata\\models\\hist_gradient_boosting.joblib"
   },
-  "metrics_output": "D:\\main\\Full\\documents\\uni\\Nam 2\\Ky 2\\big data\\cki\\fraud-detection-bigdata\\reports\\tables\\model_metrics.csv"
+  "metrics_output": "D:\\main\\Full\\documents\\uni\\Nam 2\\Ky 2\\big data\\cki\\fraud-detection-bigdata\\reports\\tables\\t4.1_model_metrics.csv"
 }

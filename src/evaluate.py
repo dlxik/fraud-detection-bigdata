@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from pathlib import Path
 
@@ -58,7 +58,7 @@ def plot_confusion_matrix(
     figure_dir: Path,
 ) -> Path:
     figure_dir.mkdir(parents=True, exist_ok=True)
-    output_path = figure_dir / f"confusion_matrix_{model_name}.png"
+    output_path = figure_dir / f"f4.1_confusion_matrix_{model_name}.png"
 
     matrix = confusion_matrix(y_true, y_pred)
     display = ConfusionMatrixDisplay(
@@ -79,7 +79,7 @@ def plot_roc_curves(
     figure_dir: Path,
 ) -> Path:
     figure_dir.mkdir(parents=True, exist_ok=True)
-    output_path = figure_dir / "roc_curve_models.png"
+    output_path = figure_dir / "f4.2_roc_curve_models.png"
 
     fig, ax = plt.subplots(figsize=(8, 6))
     for model_name, (y_true, y_score) in roc_inputs.items():
@@ -104,7 +104,7 @@ def plot_precision_recall_curves(
     figure_dir: Path,
 ) -> Path:
     figure_dir.mkdir(parents=True, exist_ok=True)
-    output_path = figure_dir / "precision_recall_curve_models.png"
+    output_path = figure_dir / "f4.3_precision_recall_curve_models.png"
 
     fig, ax = plt.subplots(figsize=(8, 6))
     for model_name, (y_true, y_score) in pr_inputs.items():
@@ -131,7 +131,7 @@ def plot_precision_recall_curves(
 
 def plot_metrics_comparison(metrics_df: pd.DataFrame, figure_dir: Path) -> Path:
     figure_dir.mkdir(parents=True, exist_ok=True)
-    output_path = figure_dir / "model_metrics_comparison.png"
+    output_path = figure_dir / "f4.4_model_metrics_comparison.png"
 
     metric_cols = ["precision", "recall", "f1_score", "roc_auc", "pr_auc"]
     plot_df = metrics_df.melt(

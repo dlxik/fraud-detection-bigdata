@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import argparse
 import json
@@ -194,7 +194,10 @@ def train_and_evaluate(
         best_threshold, tuning_df = tune_threshold_for_f1(y_val, y_val_score)
         high_recall_threshold = select_threshold_for_min_recall(tuning_df)
         tuning_df.insert(0, "model", model_name)
-        tuning_df.to_csv(table_dir / f"threshold_tuning_{model_name}.csv", index=False)
+        tuning_df.to_csv(
+            table_dir / f"t4.3_threshold_tuning_{model_name}.csv",
+            index=False,
+        )
         threshold_tables.append(tuning_df)
 
         final_model = clone(model)
@@ -229,7 +232,7 @@ def train_and_evaluate(
             report_tables.append(report_df)
 
             report_df.to_csv(
-                table_dir / f"classification_report_{output_name}.csv",
+                table_dir / f"t4.2_classification_report_{output_name}.csv",
                 index=False,
             )
             plot_confusion_matrix(output_name, y_test, y_pred, figure_dir)
@@ -242,13 +245,19 @@ def train_and_evaluate(
         saved_models[model_name] = str(model_path)
 
     metrics_df = pd.DataFrame(metrics_rows).sort_values("f1_score", ascending=False)
-    metrics_df.to_csv(table_dir / "model_metrics.csv", index=False)
+    metrics_df.to_csv(table_dir / "t4.1_model_metrics.csv", index=False)
 
     all_reports = pd.concat(report_tables, ignore_index=True)
-    all_reports.to_csv(table_dir / "classification_reports_all_models.csv", index=False)
+    all_reports.to_csv(
+        table_dir / "t4.2_classification_reports_all_models.csv",
+        index=False,
+    )
 
     all_thresholds = pd.concat(threshold_tables, ignore_index=True)
-    all_thresholds.to_csv(table_dir / "threshold_tuning_all_models.csv", index=False)
+    all_thresholds.to_csv(
+        table_dir / "t4.3_threshold_tuning_all_models.csv",
+        index=False,
+    )
 
     plot_roc_curves(roc_inputs, figure_dir)
     plot_precision_recall_curves(pr_inputs, figure_dir)
@@ -263,9 +272,9 @@ def train_and_evaluate(
         "features": int(X_train.shape[1]),
         "negative_to_positive_ratio": negative_to_positive_ratio,
         "models": saved_models,
-        "metrics_output": str(table_dir / "model_metrics.csv"),
+        "metrics_output": str(table_dir / "t4.1_model_metrics.csv"),
     }
-    (table_dir / "modeling_report.json").write_text(
+    (table_dir / "t4.4_modeling_report.json").write_text(
         json.dumps(modeling_report, indent=2),
         encoding="utf-8",
     )
