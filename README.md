@@ -20,6 +20,8 @@ Các file sử dụng:
 - `data/raw/fraudTrain.csv`: tập huấn luyện
 - `data/raw/fraudTest.csv`: tập kiểm thử
 
+Lưu ý: các file CSV trong thư mục `data/` có kích thước lớn, vì vậy project cấu hình Git LFS để đưa dataset lên GitHub.
+
 Biến mục tiêu:
 
 - `is_fraud = 0`: giao dịch hợp lệ
@@ -252,6 +254,13 @@ Cài dependencies:
 pip install -r requirements.txt
 ```
 
+Nếu clone project từ GitHub, nên cài Git LFS và tải đầy đủ dataset:
+
+```bash
+git lfs install
+git lfs pull
+```
+
 Các thư viện chính:
 
 - pandas
@@ -412,4 +421,3 @@ Hướng phát triển:
 - Kaggle Credit Card Transactions Fraud Detection Dataset: https://www.kaggle.com/datasets/kartik2112/fraud-detection
 - Apache Spark Documentation: https://spark.apache.org/docs/latest/
 - scikit-learn Documentation: https://scikit-learn.org/stable/
-

@@ -1,5 +1,3 @@
-data/raw/*.csv
-data/processed/*.csv
 __pycache__/
 *.pyc
 Slide 01 Introduction.pdf
