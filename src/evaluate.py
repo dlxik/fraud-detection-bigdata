@@ -12,9 +12,11 @@ import seaborn as sns
 from sklearn.metrics import (
     ConfusionMatrixDisplay,
     accuracy_score,
+    average_precision_score,
     classification_report,
     confusion_matrix,
     f1_score,
+    precision_recall_curve,
     precision_score,
     recall_score,
     roc_auc_score,
@@ -35,6 +37,7 @@ def evaluate_predictions(
         "recall": recall_score(y_true, y_pred, zero_division=0),
         "f1_score": f1_score(y_true, y_pred, zero_division=0),
         "roc_auc": roc_auc_score(y_true, y_score),
+        "pr_auc": average_precision_score(y_true, y_score),
     }
 
     report = classification_report(
@@ -96,11 +99,41 @@ def plot_roc_curves(
     return output_path
 
 
+def plot_precision_recall_curves(
+    pr_inputs: dict[str, tuple[pd.Series, pd.Series]],
+    figure_dir: Path,
+) -> Path:
+    figure_dir.mkdir(parents=True, exist_ok=True)
+    output_path = figure_dir / "precision_recall_curve_models.png"
+
+    fig, ax = plt.subplots(figsize=(8, 6))
+    for model_name, (y_true, y_score) in pr_inputs.items():
+        precision, recall, _ = precision_recall_curve(y_true, y_score)
+        auc = average_precision_score(y_true, y_score)
+        ax.plot(
+            recall,
+            precision,
+            label=f"{model_name.replace('_', ' ').title()} (AP={auc:.4f})",
+        )
+
+    baseline = y_true.mean()
+    ax.axhline(baseline, linestyle="--", color="gray", label=f"Fraud baseline={baseline:.4f}")
+    ax.set_title("Precision-Recall Curve Comparison")
+    ax.set_xlabel("Recall")
+    ax.set_ylabel("Precision")
+    ax.legend(loc="upper right")
+    ax.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=160, bbox_inches="tight")
+    plt.close(fig)
+    return output_path
+
+
 def plot_metrics_comparison(metrics_df: pd.DataFrame, figure_dir: Path) -> Path:
     figure_dir.mkdir(parents=True, exist_ok=True)
     output_path = figure_dir / "model_metrics_comparison.png"
 
-    metric_cols = ["precision", "recall", "f1_score", "roc_auc"]
+    metric_cols = ["precision", "recall", "f1_score", "roc_auc", "pr_auc"]
     plot_df = metrics_df.melt(
         id_vars="model",
         value_vars=metric_cols,

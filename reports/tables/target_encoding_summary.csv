@@ -1,0 +1,7 @@
+column,unique_values,smoothing
+merchant,693,50.0
+job,494,50.0
+city,894,50.0
+category,14,50.0
+state,51,50.0
+transaction_hour,24,50.0

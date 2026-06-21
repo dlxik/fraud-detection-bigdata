@@ -44,8 +44,8 @@ requirements.txt
 1. EDA: phân tích phân bố target, amount, category, merchant, thời gian, địa lý.
 2. Preprocessing: tạo feature thời gian, tuổi khách hàng, khoảng cách khách hàng-merchant, encode categorical, scale numerical.
 3. Spark Processing: xử lý dữ liệu bằng Spark DataFrame, fraud theo category/state/merchant/hour, so sánh Pandas và Spark.
-4. Modeling: huấn luyện Logistic Regression và Random Forest.
-5. Evaluation: Accuracy, Precision, Recall, F1-score, ROC-AUC, confusion matrix, ROC curve.
+4. Modeling: huấn luyện Logistic Regression, Random Forest và HistGradientBoosting.
+5. Evaluation: Accuracy, Precision, Recall, F1-score, ROC-AUC, PR-AUC, confusion matrix, ROC curve, precision-recall curve.
 
 ## Cách chạy
 
@@ -83,12 +83,14 @@ Dataset train:
 
 Kết quả mô hình trên test set:
 
-| Model | Accuracy | Precision | Recall | F1-score | ROC-AUC |
-|---|---:|---:|---:|---:|---:|
-| Random Forest | 0.9836 | 0.1802 | 0.9147 | 0.3011 | 0.9899 |
-| Logistic Regression | 0.9393 | 0.0451 | 0.7305 | 0.0850 | 0.9055 |
+| Model | Threshold | Accuracy | Precision | Recall | F1-score | ROC-AUC | PR-AUC |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| HistGradientBoosting tuned F1 | 0.80 | 0.9932 | 0.3557 | 0.9245 | 0.5137 | 0.9976 | 0.8701 |
+| HistGradientBoosting default | 0.50 | 0.9843 | 0.1938 | 0.9669 | 0.3229 | 0.9976 | 0.8701 |
+| Random Forest default/tuned | 0.50 | 0.9836 | 0.1802 | 0.9147 | 0.3011 | 0.9899 | 0.7441 |
+| Logistic Regression tuned F1 | 0.71 | 0.9849 | 0.1577 | 0.6699 | 0.2553 | 0.9055 | 0.1189 |
 
-Random Forest cho kết quả tốt hơn, đặc biệt ở Recall và ROC-AUC. Với bài toán fraud detection, Recall cao rất quan trọng vì giúp giảm số giao dịch gian lận bị bỏ sót.
+HistGradientBoosting cho kết quả tốt nhất, vừa giữ Recall rất cao để giảm bỏ sót fraud, vừa tăng mạnh Precision và F1-score so với Random Forest. F1-score tăng từ 0.3011 của Random Forest lên 0.5137, PR-AUC tăng từ 0.7441 lên 0.8701.
 
 ## Output quan trọng
 
@@ -105,4 +107,5 @@ Figures:
 - `reports/figures/confusion_matrix_random_forest.png`
 - `reports/figures/confusion_matrix_logistic_regression.png`
 - `reports/figures/roc_curve_models.png`
+- `reports/figures/precision_recall_curve_models.png`
 - `reports/figures/model_metrics_comparison.png`

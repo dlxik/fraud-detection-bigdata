@@ -7,13 +7,18 @@ from pathlib import Path
 import joblib
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.base import clone
+from sklearn.ensemble import HistGradientBoostingClassifier, RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import f1_score, precision_score, recall_score
+from sklearn.model_selection import train_test_split
+from sklearn.utils.class_weight import compute_sample_weight
 
 from evaluate import (
     evaluate_predictions,
     plot_confusion_matrix,
     plot_metrics_comparison,
+    plot_precision_recall_curves,
     plot_roc_curves,
 )
 
@@ -84,7 +89,24 @@ def build_models() -> dict[str, object]:
             n_jobs=-1,
             random_state=RANDOM_STATE,
         ),
+        "hist_gradient_boosting": HistGradientBoostingClassifier(
+            learning_rate=0.05,
+            max_iter=250,
+            max_leaf_nodes=31,
+            min_samples_leaf=20,
+            l2_regularization=0.1,
+            random_state=RANDOM_STATE,
+        ),
     }
+
+
+def fit_model(model_name: str, model: object, X: pd.DataFrame, y: pd.Series) -> object:
+    if model_name == "hist_gradient_boosting":
+        sample_weight = compute_sample_weight(class_weight="balanced", y=y)
+        model.fit(X, y, sample_weight=sample_weight)
+    else:
+        model.fit(X, y)
+    return model
 
 
 def predict_scores(model: object, X_test: pd.DataFrame) -> np.ndarray:
@@ -94,6 +116,43 @@ def predict_scores(model: object, X_test: pd.DataFrame) -> np.ndarray:
         scores = model.decision_function(X_test)
         return (scores - scores.min()) / (scores.max() - scores.min())
     raise TypeError("Model must expose predict_proba or decision_function.")
+
+
+def tune_threshold_for_f1(
+    y_true: pd.Series,
+    y_score: pd.Series,
+    thresholds: np.ndarray | None = None,
+) -> tuple[float, pd.DataFrame]:
+    if thresholds is None:
+        thresholds = np.round(np.arange(0.01, 1.0, 0.01), 2)
+
+    rows = []
+    for threshold in thresholds:
+        y_pred = (y_score >= threshold).astype(int)
+        rows.append(
+            {
+                "threshold": float(threshold),
+                "precision": precision_score(y_true, y_pred, zero_division=0),
+                "recall": recall_score(y_true, y_pred, zero_division=0),
+                "f1_score": f1_score(y_true, y_pred, zero_division=0),
+            }
+        )
+
+    tuning_df = pd.DataFrame(rows)
+    best_idx = tuning_df["f1_score"].idxmax()
+    return float(tuning_df.loc[best_idx, "threshold"]), tuning_df
+
+
+def select_threshold_for_min_recall(
+    tuning_df: pd.DataFrame,
+    min_recall: float = 0.90,
+) -> float:
+    candidates = tuning_df[tuning_df["recall"] >= min_recall]
+    if candidates.empty:
+        return float(tuning_df.sort_values("recall", ascending=False).iloc[0]["threshold"])
+
+    best_idx = candidates["f1_score"].idxmax()
+    return float(candidates.loc[best_idx, "threshold"])
 
 
 def train_and_evaluate(
@@ -106,7 +165,14 @@ def train_and_evaluate(
     train_df, test_df = load_processed_data(processed_dir)
     sampled_train_df = make_training_sample(train_df, negative_to_positive_ratio)
 
-    X_train, y_train = split_features_target(sampled_train_df)
+    X_sampled, y_sampled = split_features_target(sampled_train_df)
+    X_train, X_val, y_train, y_val = train_test_split(
+        X_sampled,
+        y_sampled,
+        test_size=0.2,
+        stratify=y_sampled,
+        random_state=RANDOM_STATE,
+    )
     X_test, y_test = split_features_target(test_df)
 
     model_dir.mkdir(parents=True, exist_ok=True)
@@ -116,29 +182,64 @@ def train_and_evaluate(
     metrics_rows: list[dict[str, float]] = []
     report_tables: list[pd.DataFrame] = []
     roc_inputs: dict[str, tuple[pd.Series, pd.Series]] = {}
+    pr_inputs: dict[str, tuple[pd.Series, pd.Series]] = {}
     saved_models: dict[str, str] = {}
+    threshold_tables: list[pd.DataFrame] = []
 
     for model_name, model in build_models().items():
         print(f"Training {model_name}...")
-        model.fit(X_train, y_train)
+        fit_model(model_name, model, X_train, y_train)
 
-        y_pred = pd.Series(model.predict(X_test), name="prediction")
-        y_score = pd.Series(predict_scores(model, X_test), name="score")
+        y_val_score = pd.Series(predict_scores(model, X_val), name="validation_score")
+        best_threshold, tuning_df = tune_threshold_for_f1(y_val, y_val_score)
+        high_recall_threshold = select_threshold_for_min_recall(tuning_df)
+        tuning_df.insert(0, "model", model_name)
+        tuning_df.to_csv(table_dir / f"threshold_tuning_{model_name}.csv", index=False)
+        threshold_tables.append(tuning_df)
 
-        metrics, report_df = evaluate_predictions(model_name, y_test, y_pred, y_score)
-        metrics_rows.append(metrics)
-        report_tables.append(report_df)
+        final_model = clone(model)
+        fit_model(model_name, final_model, X_sampled, y_sampled)
+
+        y_score = pd.Series(predict_scores(final_model, X_test), name="score")
+        prediction_sets = {
+            "default_0_50": (
+                pd.Series(final_model.predict(X_test), name="prediction"),
+                0.5,
+            ),
+            "tuned_f1": (
+                pd.Series((y_score >= best_threshold).astype(int), name="prediction"),
+                best_threshold,
+            ),
+            "high_recall_0_90": (
+                pd.Series(
+                    (y_score >= high_recall_threshold).astype(int),
+                    name="prediction",
+                ),
+                high_recall_threshold,
+            ),
+        }
+
+        for strategy, (y_pred, threshold) in prediction_sets.items():
+            output_name = f"{model_name}_{strategy}"
+            metrics, report_df = evaluate_predictions(output_name, y_test, y_pred, y_score)
+            metrics["base_model"] = model_name
+            metrics["threshold_strategy"] = strategy
+            metrics["threshold"] = threshold
+            metrics_rows.append(metrics)
+            report_tables.append(report_df)
+
+            report_df.to_csv(
+                table_dir / f"classification_report_{output_name}.csv",
+                index=False,
+            )
+            plot_confusion_matrix(output_name, y_test, y_pred, figure_dir)
+
         roc_inputs[model_name] = (y_test, y_score)
+        pr_inputs[model_name] = (y_test, y_score)
 
         model_path = model_dir / f"{model_name}.joblib"
-        joblib.dump(model, model_path)
+        joblib.dump(final_model, model_path)
         saved_models[model_name] = str(model_path)
-
-        report_df.to_csv(
-            table_dir / f"classification_report_{model_name}.csv",
-            index=False,
-        )
-        plot_confusion_matrix(model_name, y_test, y_pred, figure_dir)
 
     metrics_df = pd.DataFrame(metrics_rows).sort_values("f1_score", ascending=False)
     metrics_df.to_csv(table_dir / "model_metrics.csv", index=False)
@@ -146,12 +247,18 @@ def train_and_evaluate(
     all_reports = pd.concat(report_tables, ignore_index=True)
     all_reports.to_csv(table_dir / "classification_reports_all_models.csv", index=False)
 
+    all_thresholds = pd.concat(threshold_tables, ignore_index=True)
+    all_thresholds.to_csv(table_dir / "threshold_tuning_all_models.csv", index=False)
+
     plot_roc_curves(roc_inputs, figure_dir)
+    plot_precision_recall_curves(pr_inputs, figure_dir)
     plot_metrics_comparison(metrics_df, figure_dir)
 
     modeling_report = {
         "train_rows_full": int(len(train_df)),
         "train_rows_sampled": int(len(sampled_train_df)),
+        "train_rows_model_fit": int(len(X_train)),
+        "validation_rows_threshold_tuning": int(len(X_val)),
         "test_rows": int(len(test_df)),
         "features": int(X_train.shape[1]),
         "negative_to_positive_ratio": negative_to_positive_ratio,

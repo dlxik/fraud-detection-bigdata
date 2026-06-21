@@ -100,6 +100,9 @@ def generate_pdf(root: Path) -> Path:
     )
 
     metrics = pd.read_csv(table_dir / "model_metrics.csv")
+    metrics_display = metrics[
+        ["model", "threshold", "precision", "recall", "f1_score", "roc_auc", "pr_auc"]
+    ]
     spark_summary = pd.read_csv(table_dir / "spark_dataset_summary.csv")
     category = pd.read_csv(table_dir / "spark_fraud_by_category.csv")
     merchants = pd.read_csv(table_dir / "spark_high_risk_merchants.csv")
@@ -116,7 +119,16 @@ def generate_pdf(root: Path) -> Path:
             styles["VNBody"],
         ),
         table_from_dataframe(spark_summary),
-        Paragraph("2. EDA", styles["VNHeading"]),
+        Paragraph("2. Liên hệ Big Data 5V", styles["VNHeading"]),
+        Paragraph(
+            "Volume: hơn 1.85 triệu giao dịch train + test. Velocity: giao dịch tài chính trong thực tế phát sinh liên tục và cần cảnh báo nhanh. Variety: dữ liệu gồm amount, time, location, merchant, category và hồ sơ khách hàng. Veracity: pipeline kiểm tra missing/duplicate và loại bỏ cột định danh trực tiếp. Value: mô hình hỗ trợ phát hiện fraud, giảm rủi ro tài chính và hỗ trợ ra quyết định.",
+            styles["VNBody"],
+        ),
+        Paragraph(
+            "Dự án bao gồm ba nhiệm vụ chính của dữ liệu lớn: Data Management, Data Modeling and Analytics, Visualization/Decision/Value.",
+            styles["VNBody"],
+        ),
+        Paragraph("3. EDA", styles["VNHeading"]),
         Paragraph(
             "EDA phân tích target distribution, amount, category, merchant, thời gian, vị trí địa lý và khoảng cách customer-merchant.",
             styles["VNBody"],
@@ -128,7 +140,7 @@ def generate_pdf(root: Path) -> Path:
     story.extend(
         [
             PageBreak(),
-            Paragraph("3. Apache Spark Processing", styles["VNHeading"]),
+            Paragraph("4. Apache Spark Processing", styles["VNHeading"]),
             Paragraph(
                 "Spark DataFrame được dùng để tính fraud theo category, state, merchant và hour. Kết quả được xuất ra reports/tables.",
                 styles["VNBody"],
@@ -137,26 +149,27 @@ def generate_pdf(root: Path) -> Path:
             Spacer(1, 0.18 * inch),
             Paragraph("Top merchant có tỷ lệ fraud cao:", styles["VNBody"]),
             table_from_dataframe(merchants, max_rows=8),
-            Paragraph("4. Modeling", styles["VNHeading"]),
+            Paragraph("5. Modeling", styles["VNHeading"]),
             Paragraph(
-                "Hai mô hình được huấn luyện: Logistic Regression và Random Forest. Training dùng sampling giữ toàn bộ fraud và lấy non-fraud theo tỷ lệ 5:1, sau đó đánh giá trên toàn bộ test set.",
+                "Ba mô hình được huấn luyện: Logistic Regression, Random Forest và HistGradientBoosting. Training dùng sampling giữ toàn bộ fraud và lấy non-fraud theo tỷ lệ 5:1, tune threshold theo F1-score trên validation split, sau đó đánh giá trên toàn bộ test set.",
                 styles["VNBody"],
             ),
-            table_from_dataframe(metrics),
+            table_from_dataframe(metrics_display),
         ]
     )
     add_report_image(story, figure_dir / "roc_curve_models.png")
+    add_report_image(story, figure_dir / "precision_recall_curve_models.png")
     add_report_image(story, figure_dir / "model_metrics_comparison.png")
 
     story.extend(
         [
             PageBreak(),
-            Paragraph("5. Kết luận", styles["VNHeading"]),
+            Paragraph("6. Kết luận", styles["VNHeading"]),
             Paragraph(
-                "Random Forest là mô hình tốt nhất trong thử nghiệm, đạt Recall khoảng 0.9147 và ROC-AUC khoảng 0.9899. Với fraud detection, Recall cao giúp giảm số giao dịch gian lận bị bỏ sót. Precision vẫn còn thấp do dữ liệu cực kỳ mất cân bằng.",
+                "HistGradientBoosting tuned F1 là mô hình tốt nhất trong thử nghiệm, đạt Accuracy khoảng 0.9932, Precision khoảng 0.3557, Recall khoảng 0.9245 và F1-score khoảng 0.5137. ROC-AUC đạt khoảng 0.9976 và PR-AUC đạt khoảng 0.8701. So với Random Forest, mô hình này cải thiện rõ rệt cả khả năng phát hiện fraud và chất lượng cảnh báo.",
                 styles["VNBody"],
             ),
-            Paragraph("6. Hướng phát triển", styles["VNHeading"]),
+            Paragraph("7. Hướng phát triển", styles["VNHeading"]),
             Paragraph(
                 "Có thể cải thiện bằng threshold tuning, PR-AUC, XGBoost/LightGBM, target encoding có regularization và triển khai batch scoring bằng Spark.",
                 styles["VNBody"],
@@ -213,7 +226,9 @@ def generate_pptx(root: Path) -> Path:
     output_path = root / "reports" / "fraud_detection_presentation.pptx"
     table_dir = root / "reports" / "tables"
     figure_dir = root / "reports" / "figures"
-    metrics = pd.read_csv(table_dir / "model_metrics.csv")
+    metrics = pd.read_csv(table_dir / "model_metrics.csv")[
+        ["model", "threshold", "precision", "recall", "f1_score", "roc_auc", "pr_auc"]
+    ]
 
     prs = Presentation()
     add_title_slide(
@@ -240,18 +255,29 @@ def generate_pptx(root: Path) -> Path:
             "Target: is_fraud.",
         ],
     )
+    add_bullets_slide(
+        prs,
+        "Big Data 5V Mapping",
+        [
+            "Volume: more than 1.85M transactions across train and test.",
+            "Velocity: financial transactions require fast fraud alerts.",
+            "Variety: amount, time, location, merchant, category and customer profile.",
+            "Veracity: missing/duplicate checks and direct identifier removal.",
+            "Value: fraud detection supports risk reduction and decision making.",
+        ],
+    )
     add_picture_slide(prs, "Target Distribution", figure_dir / "target_distribution.png")
     add_picture_slide(prs, "Category Fraud Analysis", figure_dir / "category_transaction_count_and_fraud_rate.png")
     add_bullets_slide(
         prs,
-        "Preprocessing",
-        [
-            "Time features: hour, day of week, month, weekend flag.",
-            "Customer age and customer-merchant distance.",
-            "One-hot encoding for category/gender/state.",
-            "Frequency encoding for merchant/job/city.",
-            "Numeric scaling and removal of direct identifiers.",
-        ],
+            "Preprocessing",
+            [
+                "Time features: hour, day of week, month, weekend flag.",
+                "Customer age and customer-merchant distance.",
+                "One-hot encoding for category/gender/state.",
+                "Frequency encoding for merchant/job/city.",
+                "Numeric scaling and removal of direct identifiers.",
+            ],
     )
     add_bullets_slide(
         prs,
@@ -265,16 +291,18 @@ def generate_pptx(root: Path) -> Path:
     )
     add_metrics_slide(prs, metrics)
     add_picture_slide(prs, "ROC Curve", figure_dir / "roc_curve_models.png")
+    add_picture_slide(prs, "Precision-Recall Curve", figure_dir / "precision_recall_curve_models.png")
     add_picture_slide(prs, "Confusion Matrix - Random Forest", figure_dir / "confusion_matrix_random_forest.png")
     add_bullets_slide(
         prs,
-        "Conclusion",
-        [
-            "Random Forest achieved the best overall performance.",
-            "Recall: 0.9147, ROC-AUC: 0.9899.",
-            "High recall is important to reduce missed fraud cases.",
-            "Future work: threshold tuning, PR-AUC, XGBoost/LightGBM.",
-        ],
+            "Conclusion",
+            [
+                "HistGradientBoosting achieved the best overall performance.",
+                "Recall: 0.9245, F1-score: 0.5137.",
+                "ROC-AUC: 0.9976, PR-AUC: 0.8701.",
+                "F1-score improved from Random Forest's 0.3011 to 0.5137.",
+                "Future work: threshold tuning, PR-AUC, XGBoost/LightGBM.",
+            ],
     )
 
     prs.save(output_path)
